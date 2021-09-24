@@ -3,7 +3,7 @@ import re
 
 
 
-cep = "32187120"
+cep = "000000000"
 url = f"https://www.cepaberto.com/api/v3/cep?cep={cep}"
 # O seu token está visível apenas pra você
 headers = {'Authorization': 'Token token=...'}
