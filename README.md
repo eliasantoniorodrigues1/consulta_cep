@@ -9,7 +9,7 @@ import requests
 
 url = "https://www.cepaberto.com/api/v3/cep?cep=01001000"
 # O seu token está visível apenas pra você
-headers = {'Authorization': 'Obtenha sueu t'}
+headers = {'Authorization': 'Obtenha seu token aqui: https://cepaberto.com'}
 response = requests.get(url, headers=headers)
 
 print(response.json())
