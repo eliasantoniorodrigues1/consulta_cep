@@ -17,7 +17,7 @@ def consulta_cep(cep: str):
     url = f"https://www.cepaberto.com/api/v3/cep?cep={cep}"
 
     # O seu token está visível apenas pra você
-    headers = {'Authorization': 'Token token=b307af069f8f5e60c4c03be00251e29b'}
+    headers = {'Authorization': 'Token token=...'}
     r = requests.get(url, headers=headers)
     try:
         return r.json()
