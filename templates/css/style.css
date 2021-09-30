@@ -1,0 +1,46 @@
+html, body {
+  height: 100%;
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#tudo {
+  min-height: 100%;
+}
+
+* html #container {
+  height: 100%;
+}
+
+#tudo {
+  position: relative;
+}
+
+#conteudo {
+  padding-bottom: 30px;
+}
+
+h6 {
+  margin: 10px;
+  color: #fff;
+}
+small {
+  flood-color: #fff;
+}
+footer {
+  clear: both;
+  border-top: 1px solid black;
+  text-align: center;
+  font-size: 12px;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+}
+p#progress-bar {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* footer {
+  position: absolute;
+  bottom: 0;
+} */

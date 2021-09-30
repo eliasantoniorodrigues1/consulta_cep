@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <title>Consulta CEP</title>
+</head>
+
+<body>
+  <div class="container" id="tudo">
+    <!-- Header -->
+    <div id="cabecalho">
+      <nav class="navbar navbar-dark bg-primary">
+        <!-- Navbar content -->
+        <h6>
+          Consulta CEP<br>
+          <small class="text-inner">envie seu arquivo e consulte os dados de forma automática</small>
+
+        </h6>
+      </nav>
+    </div>
+    <!-- Content -->
+    <div id="conteudo">
+      <br>
+      <label for="formFileSm" class="form-label"><strong>Planilha contendo apenas a coluna de CEP:</strong></label>
+      <input class="form-control form-control-1g" id="formFilelg" type="file">
+      <br>
+      <button type="button" class="btn btn-primary">Confirmar</button>
+    </div>
+
+    <p id="progress-bar">Por favor aguarde...</p>
+    <div class="progress">
+      <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+    </div>
+
+    <!-- Footer -->
+    <div id="rodape">
+      <footer class="footer navbar-fixed-bottom">
+        <div class="social">
+          <a href="https://www.instagram.com/elias.rodrigues1/" class="me-4 text-reset">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="https://www.linkedin.com/in/elias-antonio-rodrigues-525b5933/" class="me-4 text-reset">
+            <i class="fab fa-linkedin"></i>
+          </a>
+          <a href="https://github.com/eliasantoniorodrigues1" class="me-4 text-reset">
+            <i class="fab fa-github"></i>
+          </a>
+          <div class="text-center p-4" style="background-color: rgba(0, 0, 0, 0.05);">
+            © 2021 Desenvolvido por:
+            <a class="text-reset fw-bold" href="https://mdbootstrap.com/">Elias Rodrigues</a>
+          </div>
+      </footer>      
+    </div>
+  </div>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="https://kit.fontawesome.com/25f4485ca7.js" crossorigin="anonymous"></script>
+</body>
+
+</html>
