@@ -25,48 +25,84 @@ def consulta_cep(cep: str):
         return {}
 
 
+def consulta_cep_consolidado(cep: str):
+    with open('ceps_consolidado.json', encoding='utf-8') as f:
+        dados = json.load(f)
+
+    ceps = []
+    for dado in dados:
+        ceps.append(remove_non_digit(str(dado['cep'])))
+
+    print(ceps)
+    # tamanho = len(dict_consolidado)
+    # meio = tamanho // 2
+    # todos_ceps = [cep for cep in dict_consolidado]
+
+    # print(todos_ceps)
+
+
 def remove_non_digit(string: str):
     return re.sub(r'\D', '', string)[:8]
 
 
+def pesquisa_binaria(busca: int, lista: list):
+    baixo = 0
+    alto = len(lista) - 1
+
+    while baixo <= alto:
+        meio = (baixo + alto) / 2
+        chute = lista[meio]
+        if chute == busca:
+            return meio
+        if chute > busca:
+            alto = meio - 1
+        else:
+            baixo = meio + 1
+    return None
+
+
 if __name__ == '__main__':
 
-    ceps = carrega_dados_plan()
-    # ceps = ['32187120', '30190060', '32210700']
-    dados_cep = []
-    print(f'Coletando dados dos ceps...')
-    for i, cep in enumerate(ceps):
-        # O intervalo entre cada request tem que ser
-        # de 1 segundo senão o site bloqueia:
-        # Máximo de 10 mil consultas por dia.
-        sleep(1.5)
-        print(f'CEP: {cep}')
-        dicionario = dict(consulta_cep(str(cep)))
-        print(f'Resultado da busca: {dicionario}')
+    # ceps = carrega_dados_plan()
+    ceps = ['32187120', '30190060', '32210700']
 
-        # Se retornar alguma coisa na pesquisa salva:
-        if dicionario:
-            # Cria o dicionário com os valores que desejo do json:
-            dict_data = {
-                'cep': dicionario['cep'] if 'cep' in dicionario.keys() else 'NE',
-                'estado': dicionario['estado']['sigla'] if 'estado' in dicionario.keys() else 'NE',
-                'cidade': dicionario['cidade']['nome'] if 'cidade' in dicionario.keys() else 'NE',
-                'ddd': dicionario['cidade']['ddd'] if 'cep' in dicionario.keys() else 'NE',
-                'logradouro': dicionario['logradouro'] if 'logradouro' in dicionario.keys() else 'NE'
-            }
-        else:
-            dict_data = {
-                'cep': cep,
-                'estado': 'NE',
-                'cidade': 'NE',
-                'ddd': 'NE',
-                'logradouro': 'NE'
-            }
+    consulta_cep_consolidado(ceps[0])
 
-        # Consolida a informação na lista geral:
-        with open('ceps_consolidados.json', 'a+', encoding='utf-8') as f:
-            f.write(json.dumps(dict_data, indent=4))
-        # dados_cep.append(dict_data.copy())
-        dict_data.clear()
-        dicionario.clear()
-    print(dados_cep)
+    # dados_cep = []
+    # print(f'Coletando dados dos ceps...')
+    # for i, cep in enumerate(ceps):
+    #     # O intervalo entre cada request tem que ser
+    #     # de 1 segundo senão o site bloqueia:
+    #     # Máximo de 10 mil consultas por dia.
+    #     sleep(1.1)
+    #     print(f'CEP: {cep}')
+    #     if cep in
+    #     dicionario = dict(consulta_cep(str(cep)))
+    #     print(f'Resultado da busca: {dicionario}')
+
+    #     # Se retornar alguma coisa na pesquisa salva:
+    #     if dicionario:
+    #         # Cria o dicionário com os valores que desejo do json:
+    #         dict_data = {
+    #             'cep': dicionario['cep'] if 'cep' in dicionario.keys() else 'NE',
+    #             'estado': dicionario['estado']['sigla'] if 'estado' in dicionario.keys() else 'NE',
+    #             'cidade': dicionario['cidade']['nome'] if 'cidade' in dicionario.keys() else 'NE',
+    #             'ddd': dicionario['cidade']['ddd'] if 'cep' in dicionario.keys() else 'NE',
+    #             'logradouro': dicionario['logradouro'] if 'logradouro' in dicionario.keys() else 'NE'
+    #         }
+    #     else:
+    #         dict_data = {
+    #             'cep': cep,
+    #             'estado': 'NE',
+    #             'cidade': 'NE',
+    #             'ddd': 'NE',
+    #             'logradouro': 'NE'
+    #         }
+
+    #     # Consolida a informação na lista geral:
+    #     with open('ceps_consolidados.json', 'a+', encoding='utf-8') as f:
+    #         f.write(json.dumps(dict_data, indent=4))
+    #     # dados_cep.append(dict_data.copy())
+    #     dict_data.clear()
+    #     dicionario.clear()
+    # print(dados_cep)
