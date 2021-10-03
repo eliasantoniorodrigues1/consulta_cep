@@ -14,17 +14,10 @@
         "logradouro": "Rua dos Tupis"
     },
     {
-        "cep": 32210700,
-        "estado": "NE",
-        "cidade": "NE",
-        "ddd": "NE",
-        "logradouro": "NE"
-    },
-    {
-        "cep": 68740000.0,
-        "estado": "NE",
-        "cidade": "NE",
-        "ddd": "NE",
-        "logradouro": "NE"
+        "cep": "31210700",
+        "estado": "MG",
+        "cidade": "Belo Horizonte",
+        "ddd": 31,
+        "logradouro": "Travessa Jos\u00e9 Laerte"
     }
 ]

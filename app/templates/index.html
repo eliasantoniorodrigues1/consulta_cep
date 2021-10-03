@@ -5,8 +5,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style/style.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style/bootstrap.min.css') }}">
   <title>Consulta CEP</title>
 </head>
 
@@ -26,12 +26,33 @@
     <!-- Content -->
     <div id="conteudo">
       <br>
-      <label for="formFileSm" class="form-label"><strong>Planilha contendo apenas a coluna de CEP:</strong></label>
-      <input class="form-control form-control-1g" id="formFilelg" type="file">
-      <br>
-      <button type="button" class="btn btn-primary">Confirmar</button>
+      <form method=post enctype=multipart/form-data>
+        <label for="formFileSm" class="form-label"><strong>Planilha contendo apenas a coluna de CEP:</strong></label>
+        <input class="form-control form-control-1g" id="formFilelg" type="file" name="file">
+        <br>
+        <input class="btn btn-primary" type="submit" value="Upload">
+      </form>
     </div>
 
+    <div class="display">
+        <form action="" method=get>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Nome do Arquivo</th>
+                    </tr>
+               </thead>
+               <tbody>
+                 <tr>
+                  <td>{{ filename }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <input class="btn btn-primary" type="submit" value="Executar Consulta">
+        </form>
+    </div>
+
+    <br>
     <p id="progress-bar">Por favor aguarde...</p>
     <p id="progress-bar">Ao final do processo você receberá um email com o arquivo consolidado.</p>
     <div class="progress">
@@ -59,6 +80,7 @@
     </div>
   </div>
   <script src="js/bootstrap.min.js"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
   <script src="https://kit.fontawesome.com/25f4485ca7.js" crossorigin="anonymous"></script>
 </body>
 
