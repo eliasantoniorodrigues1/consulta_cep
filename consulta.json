@@ -1,0 +1,30 @@
+[
+    {
+        "cep": "32187120",
+        "estado": "MG",
+        "cidade": "Contagem",
+        "ddd": 31,
+        "logradouro": "Rua Cai\u00e7aras"
+    },
+    {
+        "cep": "30190060",
+        "estado": "MG",
+        "cidade": "Belo Horizonte",
+        "ddd": 31,
+        "logradouro": "Rua dos Tupis"
+    },
+    {
+        "cep": 32210700,
+        "estado": "NE",
+        "cidade": "NE",
+        "ddd": "NE",
+        "logradouro": "NE"
+    },
+    {
+        "cep": 68740000.0,
+        "estado": "NE",
+        "cidade": "NE",
+        "ddd": "NE",
+        "logradouro": "NE"
+    }
+]

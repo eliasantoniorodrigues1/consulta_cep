@@ -130,6 +130,44 @@ def dict_to_csv(nome):
             w.writerow(dado)
 
 
+def remove_duplicados_json(fullpathfile: str, name: str):
+    # Função para remover dicionários duplicados dentro de um
+    # arquivo json usando set()
+    with open(fullpathfile, 'r') as f:
+    lista = json.load(f)
+
+    # Grava o arquivo sem duplicidades:
+    with open(f'{name}.json', 'w+') as f:
+        visto = set()
+        lista_dict_unico = []
+        for dicionario in lista:
+            dados_tupla = tuple(dicionario.items())
+            if dados_tupla not in visto:
+                visto.add(dados_tupla)
+                lista_dict_unico.append(dicionario)
+        
+        json.dump(lista_dict_unico, f, indent=4)
+
+
+def pesquisa_binaria(busca: int, lista: list):
+    # Recebe uma lista e um valor inteiro para ser buscado
+    # dentro dessa lista.
+    baixo = 0
+    alto = len(lista) - 1
+
+    while baixo <= alto:
+        meio = (baixo + alto) // 2
+        chute = lista[meio]
+        print(chute, lista)
+        if chute == busca:
+            return True
+        if chute > busca:
+            alto = meio - 1
+        else:
+            baixo = meio + 1
+    return None
+
+
 if __name__ == '__main__':
     texto = 'EÇOALHO caroço até joão avô'
     print(remove_acentos(texto))

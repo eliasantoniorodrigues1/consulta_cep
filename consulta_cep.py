@@ -17,7 +17,7 @@ def consulta_cep(cep: str):
     url = f"https://www.cepaberto.com/api/v3/cep?cep={cep}"
 
     # O seu token está visível apenas pra você
-    headers = {'Authorization': 'Token token=...'}
+    headers = {'Authorization': 'Token token=b307af069f8f5e60c4c03be00251e29b'}
     r = requests.get(url, headers=headers)
     try:
         return r.json()
@@ -25,84 +25,106 @@ def consulta_cep(cep: str):
         return {}
 
 
-def consulta_cep_consolidado(cep: str):
+def consulta_cep_consolidado():
+    # Nome padrão do arquivo de consolidação:
+    # Sem duplicidades
     with open('ceps_consolidado.json', encoding='utf-8') as f:
         dados = json.load(f)
 
     ceps = []
     for dado in dados:
-        ceps.append(remove_non_digit(str(dado['cep'])))
+        if 'cep' in dado.keys():
+            ceps.append(int(remove_non_digit(str(dado['cep']))))
 
-    print(ceps)
-    # tamanho = len(dict_consolidado)
-    # meio = tamanho // 2
-    # todos_ceps = [cep for cep in dict_consolidado]
+    # Ordena a lista
+    ceps_ordenados = sorted(ceps)
 
-    # print(todos_ceps)
+    # Remove Duplicados
+    ceps_ordenados = list(set(ceps_ordenados))
+
+    return ceps_ordenados
 
 
 def remove_non_digit(string: str):
     return re.sub(r'\D', '', string)[:8]
 
 
-def pesquisa_binaria(busca: int, lista: list):
-    baixo = 0
-    alto = len(lista) - 1
-
-    while baixo <= alto:
-        meio = (baixo + alto) / 2
-        chute = lista[meio]
-        if chute == busca:
-            return meio
-        if chute > busca:
-            alto = meio - 1
-        else:
-            baixo = meio + 1
-    return None
-
+def filtra_consulta(lista: list):
+    return 
 
 if __name__ == '__main__':
 
-    # ceps = carrega_dados_plan()
-    ceps = ['32187120', '30190060', '32210700']
+    # Carga inicial de ceps para consulta:
+    # Dados enviado pelo usuário:
+    ceps = carrega_dados_plan()
+    # ceps = [32187120, 30190060, 32210700, 68740000]
 
-    consulta_cep_consolidado(ceps[0])
+    Carrega os ceps da base de dados para uma lista
+    e valida se o mesmo já foi consultado:
+    lista_ceps_consultados = consulta_cep_consolidado()
+    
+    dados_cep = []
+    print(f'Coletando dados dos ceps...')
 
-    # dados_cep = []
-    # print(f'Coletando dados dos ceps...')
-    # for i, cep in enumerate(ceps):
-    #     # O intervalo entre cada request tem que ser
-    #     # de 1 segundo senão o site bloqueia:
-    #     # Máximo de 10 mil consultas por dia.
-    #     sleep(1.1)
-    #     print(f'CEP: {cep}')
-    #     if cep in
-    #     dicionario = dict(consulta_cep(str(cep)))
-    #     print(f'Resultado da busca: {dicionario}')
+    # Carrega o json para adicionar ou não um valor a ele:
+    with open('ceps_consolidado.json', 'r', encoding='utf-8') as f:
+        base_consolidada = json.load(f)
+    
+    for i, cep in enumerate(ceps):
+        # Valida se será necessário realizar o request do cep
+        if cep in lista_ceps_consultados:
+            continue
+        else:
+            print('Consultar Cep')
+            # O intervalo entre cada request tem que ser
+            # de 1 segundo senão o site bloqueia:
+            # Máximo de 10 mil consultas por dia.
+            sleep(1.1)
+            print(f'CEP: {cep}')
+            dicionario = dict(consulta_cep(str(cep)))
+            print(f'Resultado da busca: {dicionario}')
 
-    #     # Se retornar alguma coisa na pesquisa salva:
-    #     if dicionario:
-    #         # Cria o dicionário com os valores que desejo do json:
-    #         dict_data = {
-    #             'cep': dicionario['cep'] if 'cep' in dicionario.keys() else 'NE',
-    #             'estado': dicionario['estado']['sigla'] if 'estado' in dicionario.keys() else 'NE',
-    #             'cidade': dicionario['cidade']['nome'] if 'cidade' in dicionario.keys() else 'NE',
-    #             'ddd': dicionario['cidade']['ddd'] if 'cep' in dicionario.keys() else 'NE',
-    #             'logradouro': dicionario['logradouro'] if 'logradouro' in dicionario.keys() else 'NE'
-    #         }
-    #     else:
-    #         dict_data = {
-    #             'cep': cep,
-    #             'estado': 'NE',
-    #             'cidade': 'NE',
-    #             'ddd': 'NE',
-    #             'logradouro': 'NE'
-    #         }
+            # Se retornar alguma coisa na pesquisa salva:
+            if dicionario:
+                # Cria o dicionário com os valores que desejo do json:
+                dict_data = {
+                    'cep': dicionario['cep'] if 'cep' in dicionario.keys() else 'NE',
+                    'estado': dicionario['estado']['sigla'] if 'estado' in dicionario.keys() else 'NE',
+                    'cidade': dicionario['cidade']['nome'] if 'cidade' in dicionario.keys() else 'NE',
+                    'ddd': dicionario['cidade']['ddd'] if 'cep' in dicionario.keys() else 'NE',
+                    'logradouro': dicionario['logradouro'] if 'logradouro' in dicionario.keys() else 'NE'
+                }
+            else:
+                dict_data = {
+                    'cep': cep,
+                    'estado': 'NE',
+                    'cidade': 'NE',
+                    'ddd': 'NE',
+                    'logradouro': 'NE'
+                }
 
-    #     # Consolida a informação na lista geral:
-    #     with open('ceps_consolidados.json', 'a+', encoding='utf-8') as f:
-    #         f.write(json.dumps(dict_data, indent=4))
-    #     # dados_cep.append(dict_data.copy())
-    #     dict_data.clear()
-    #     dicionario.clear()
-    # print(dados_cep)
+            # Consolida a informação na lista geral:
+            base_consolidada.append(dict_data.copy())
+            dict_data.clear()
+            dicionario.clear()
+    
+
+    # Regrava os dados no json:
+    with open('ceps_consolidado.json', 'w+', encoding='utf-8') as f:
+        json.dump(base_consolidada, f, indent=4)
+
+    # Retorna um json apenas com a consulta do usuário:
+    with open('ceps_consolidado.json', 'r', encoding='utf-8') as f:
+        filtrar = json.load(f)
+
+    consulta = []
+    for cep in ceps:
+        for dado in filtrar:
+            if int(dado['cep']) == int(cep):
+                consulta.append(dado)
+
+    with open('consulta.json', 'w+', encoding='utf-8') as f:
+        json.dump(consulta, f, indent=4)
+
+
+    

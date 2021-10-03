@@ -1,10 +1,17 @@
 import json
 
-with open('teste.json', 'r') as f:
-    dados = json.load(f)
+with open('ceps_consolidado.json', 'r') as f:
+    lista = json.load(f)
 
-ceps = []
-for dado in dados:
-    ceps.append(dado['cep'])
+with open('ceps_consolidao_unico.json', 'w+') as f:
+    visto = set()
+    lista_dict_unico = []
+    for dicionario in lista:
+        dados_tupla = tuple(dicionario.items())
+        if dados_tupla not in visto:
+            visto.add(dados_tupla)
+            lista_dict_unico.append(dicionario)
+    
+    json.dump(lista_dict_unico, f, indent=4)
 
-print(ceps)
+print(lista_dict_unico)
