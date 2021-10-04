@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, url_for, redirect, flash
 from werkzeug.utils import secure_filename
 import consulta_cep
 import os
+import json
 
 # Diretório padrão do projeto:
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -37,26 +38,47 @@ def upload_file():
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
         if file.filename == '':
-            flash('No selected file')
+            flash('Você não selecionou nenhum arquivo.', 'danger')
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             full_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            print('Upload realizado com sucesso!')
             file.save(full_path)
-            flash('Arquivo carregado com sucesso!')
+            flash('Arquivo carregado com sucesso!', 'success')
+
+            # cria dicionário para armazernar os dados da consulta:
+            dict_dados_usuario = {
+                "filename": filename,
+            }
+            # Grava em um json os dados do usuário:
+            with open(os.path.join(BASE_DIR, 'dados_usuario.json'), 'w+') as f:
+                json.dump(dict_dados_usuario, f, indent=4)
+
             return render_template('index.html', filename=filename.capitalize())
-            # return redirect(url_for('download_file', name=filename))
+
     return render_template('index.html')
-    # '''
-    # <!doctype html>
-    # <title>Upload new File</title>
-    # <h1>Upload new File</h1>
-    # <form method=post enctype=multipart/form-data>
-    #     <input type=file name=file>
-    #     <input type=submit value=Upload>
-    # </form>
-    # '''
+
+
+@app.route('/executar_consulta', methods=['GET', 'POST'])
+def executar_consulta():
+    # Coleto o email digitado pelo usuário
+    email = str(request.form['email_input'])
+    with open(os.path.join(BASE_DIR, 'dados_usuario.json'), 'r') as f:
+        dict_usuario = json.load(f)
+        dict_usuario['email'] = email
+
+    flash(dict_usuario)
+
+    with open(os.path.join(BASE_DIR, 'dados_usuario.json'), 'w+') as f:
+        json.dump(dict_usuario, f, indent=4)
+
+    flash(os.path.join(UPLOAD_FOLDER, dict_usuario['filename']))
+
+    lista_ceps_usuario = consulta_cep.carrega_dado_inicial(os.path.join(
+        UPLOAD_FOLDER, dict_usuario['filename']))
+
+    flash(lista_ceps_usuario)
+    return render_template('index.html')
 
 
 if __name__ == '__main__':

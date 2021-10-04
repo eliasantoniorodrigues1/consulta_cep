@@ -9,7 +9,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 
 
-def carrega_dados_plan(file_path):
+def carrega_dados_inicial(file_path):
     # Pego a coluna de CEP da base da Michele:
     df = pd.read_excel(file_path)
     ceps = df.iloc[:, 0].dropna().drop_duplicates()
@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
     # Carga inicial de ceps para consulta:
     # Dados enviado pelo usuário:
-    ceps = carrega_dados_plan()
+    ceps = carrega_dados_inicial(None)
     # ceps = [32187120, 30190060, 32210700, 68740000]
 
     # Carrega os ceps da base de dados para uma lista
