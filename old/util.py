@@ -49,7 +49,7 @@ def data_agora_str():
     return datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
 
 
-def envia_email(to, subject, messsage, filename=None, imagem=None, frm=None, host='mail.grupoaec.com.br', port=2525, password=None):
+def envia_email(to, subject, messsage, filename=None, imagem=None, frm=None, host='smtp.gmail.com', port=587, password='Ear*231916'):
 
     LOG_DIR = os.path.join(BASE_DIR, 'log')
 
@@ -68,10 +68,10 @@ def envia_email(to, subject, messsage, filename=None, imagem=None, frm=None, hos
     msg.attach(corpo)
 
     # Tratando a imagem
-    with open(imagem, 'rb') as img:
-        email_image = MIMEImage(img.read())
-        email_image.add_header('Content-ID', '<imagem>')
-        msg.attach(email_image)
+    # with open(imagem, 'rb') as img:
+    #     email_image = MIMEImage(img.read())
+    #     email_image.add_header('Content-ID', '<imagem>')
+    #     msg.attach(email_image)
 
     with smtplib.SMTP(host=host, port=port) as smtp:
         try:

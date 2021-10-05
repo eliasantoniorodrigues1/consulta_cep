@@ -3,6 +3,7 @@ from werkzeug.utils import secure_filename
 import consulta_cep
 import os
 import json
+from time import sleep
 
 # Diretório padrão do projeto:
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -59,25 +60,98 @@ def upload_file():
     return render_template('index.html')
 
 
-@app.route('/executar_consulta', methods=['GET', 'POST'])
+@app.route('/executar-consulta', methods=['POST', 'GET'])
 def executar_consulta():
     # Coleto o email digitado pelo usuário
-    email = str(request.form['email_input'])
+    email = request.form['email_input']
     with open(os.path.join(BASE_DIR, 'dados_usuario.json'), 'r') as f:
         dict_usuario = json.load(f)
         dict_usuario['email'] = email
 
-    flash(dict_usuario)
-
+    # Salva dados do usuário no json:
     with open(os.path.join(BASE_DIR, 'dados_usuario.json'), 'w+') as f:
         json.dump(dict_usuario, f, indent=4)
 
-    flash(os.path.join(UPLOAD_FOLDER, dict_usuario['filename']))
+    # Lista de Ceps que serão consultados:
+    ceps = consulta_cep.carrega_dados_inicial(
+        os.path.join(UPLOAD_FOLDER, dict_usuario['filename']))
 
-    lista_ceps_usuario = consulta_cep.carrega_dado_inicial(os.path.join(
-        UPLOAD_FOLDER, dict_usuario['filename']))
+    # Valida se a lista de ceps já foi consultada:
+    lista_ceps_consultados = consulta_cep.consulta_cep_consolidado()
 
-    flash(lista_ceps_usuario)
+    # Carrega o json para adicionar ou não um valor a ele:
+    with open(os.path.join(BASE_DIR, 'ceps_consolidado.json'), 'r', encoding='utf-8') as f:
+        base_consolidada = json.load(f)
+
+    for i, cep in enumerate(ceps):
+        # Valida se será necessário realizar o request do cep
+        if cep in lista_ceps_consultados:
+            continue
+        else:
+            # O intervalo entre cada request tem que ser
+            # de 1 segundo senão o site bloqueia:
+            # Máximo de 10 mil consultas por dia.
+            sleep(1.1)
+
+            dicionario = dict(consulta_cep.consulta_cep(str(cep)))
+
+            # Se retornar alguma coisa na pesquisa salva:
+            if dicionario:
+                # Cria o dicionário com os valores que desejo do json:
+                dict_data = {
+                    'cep': dicionario['cep'] if 'cep' in dicionario.keys() else 'NE',
+                    'estado': dicionario['estado']['sigla'] if 'estado' in dicionario.keys() else 'NE',
+                    'cidade': dicionario['cidade']['nome'] if 'cidade' in dicionario.keys() else 'NE',
+                    'ddd': dicionario['cidade']['ddd'] if 'cep' in dicionario.keys() else 'NE',
+                    'logradouro': dicionario['logradouro'] if 'logradouro' in dicionario.keys() else 'NE'
+                }
+            else:
+                dict_data = {
+                    'cep': cep,
+                    'estado': 'NE',
+                    'cidade': 'NE',
+                    'ddd': 'NE',
+                    'logradouro': 'NE'
+                }
+
+            # Consolida a informação na lista geral:
+            base_consolidada.append(dict_data.copy())
+            dict_data.clear()
+            dicionario.clear()
+
+    # Regrava os dados no json:
+    with open(os.path.join(BASE_DIR, 'ceps_consolidado.json'), 'w+', encoding='utf-8') as f:
+        json.dump(base_consolidada, f, indent=4)
+
+    # Retorna um json apenas com a consulta do usuário:
+    with open(os.path.join(BASE_DIR, 'ceps_consolidado.json'), 'r', encoding='utf-8') as f:
+        filtrar = json.load(f)
+
+    consulta = []
+    for cep in ceps:
+        for dado in filtrar:
+            if int(dado['cep']) == int(cep):
+                consulta.append(dado)
+
+    # Salva um json com a consulta do usuário:
+    with open(os.path.join(BASE_DIR, 'consulta.json'), 'w+', encoding='utf-8') as f:
+        json.dump(consulta, f, indent=4)
+
+    # Cria o arquivo CSV que será enviado por email:
+    consulta_cep.salva_csv()
+
+    # Envia email
+    with open(os.path.join(BASE_DIR, 'dados_usuario.json'), 'r') as f:
+        dict_usuario = json.load(f)
+
+    with open(os.path.join(TEMPLATE_DIR, 'mensagem_email.html'), 'r') as html:
+        mensagem = html.read()
+
+    consulta_cep.envia_email(dict_usuario['email'],
+                             'Resultado da sua consulta de CEPS', mensagem)
+
+    flash('Tudo certo, agora é só aguardar o e-mail chegar na sua caixa de entrada', 'success')
+
     return render_template('index.html')
 
 

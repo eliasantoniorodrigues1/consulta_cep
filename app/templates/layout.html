@@ -19,7 +19,7 @@
       {% include'includes/_messages.html' %}
       {% block body %}{% endblock %}
       <br>
-      <form method=post enctype=multipart/form-data>
+      <form method="post" enctype="multipart/form-data" action="/">
         <label for="formFileSm" class="form-label"><strong>Por favaor, carregue uma planilha contendo apenas a coluna de CEP:</strong></label>
         <input class="form-control form-control-1g" id="formFilelg" type="file" name="file">
         <br>
@@ -28,7 +28,7 @@
     </div>
 
     <div class="display">
-        <form action="" method=get>
+        <form method="post" action="/executar-consulta">
             <table class="table">
               <thead>
                 <tr>
@@ -49,14 +49,8 @@
               <input class="btn btn-primary" type="submit" value="Executar Consulta" name="btnexecutar">
         </form>
     </div>
-
     <br>
-    <p id="progress-bar">Por favor aguarde...</p>
     <p id="progress-bar">Ao final do processo você receberá um email com o arquivo consolidado.</p>
-    <div class="progress">
-      <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
-    </div>
-
     <!-- Footer -->
     <div id="rodape">
       <footer class="footer navbar-fixed-bottom">
