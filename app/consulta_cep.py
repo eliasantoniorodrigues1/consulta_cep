@@ -72,7 +72,7 @@ def salva_csv():
             w.writerow(dado)
 
 
-def envia_email(to, subject, messsage, filename=None, imagem=None, frm="leleuf3@gmail.com", host='smtp.gmail.com', port=587, password='Ear*231916'):
+def envia_email(to, subject, messsage, filename=None, imagem=None, frm=None, host='smtp.gmail.com', port=587, password=None):
 
     msg = MIMEMultipart()
     msg['from'] = frm
