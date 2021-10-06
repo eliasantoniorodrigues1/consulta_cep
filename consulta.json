@@ -1,23 +1,16 @@
 [
     {
-        "cep": "32187120",
-        "estado": "MG",
-        "cidade": "Contagem",
-        "ddd": 31,
-        "logradouro": "Rua Cai\u00e7aras"
-    },
-    {
-        "cep": "30190060",
+        "cep": "30130001",
         "estado": "MG",
         "cidade": "Belo Horizonte",
         "ddd": 31,
-        "logradouro": "Rua dos Tupis"
+        "logradouro": "Avenida Afonso Pena"
     },
     {
-        "cep": "31210700",
+        "cep": "31814620",
         "estado": "MG",
         "cidade": "Belo Horizonte",
         "ddd": 31,
-        "logradouro": "Travessa Jos\u00e9 Laerte"
+        "logradouro": "Rua Waldomiro Lobo"
     }
 ]

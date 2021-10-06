@@ -1,0 +1,33 @@
+<br>
+<form method="post" enctype="multipart/form-data" action="/">
+  <label for="formFileSm" class="form-label"><strong>Por favaor, carregue uma planilha contendo apenas a coluna de CEP:</strong></label>
+  <input class="form-control form-control-1g" id="formFilelg" type="file" name="file">
+  <br>
+  <input class="btn btn-primary" type="submit" value="Upload">
+</form>
+</div>
+
+<div class="display">
+  <form method="post" action="/executar-consulta">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Nome do Arquivo</th>
+              </tr>
+         </thead>
+         <tbody>
+           <tr>
+            <td>{{ filename }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <label for="formFileSm" class="form-label">Insira seu e-mail para receber o arquivo, após o término do processamento:</label>
+        <input type="email" class="form-control" name="email_input" placeholder="Digite seu e-mail">
+        <small id="emailHelp" class="form-text text-muted">Seu e-mail não ficará salvo na nossa base de dados</small>
+        <br>
+        <br>
+        <input class="btn btn-primary" type="submit" value="Executar Consulta" name="btnexecutar">
+  </form>
+</div>
+<br>
+<p id="progress-bar">Ao final do processo você receberá um email com o arquivo consolidado.</p>

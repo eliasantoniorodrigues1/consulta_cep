@@ -1,5 +1,8 @@
 from flask import Flask, request, render_template, url_for, redirect, flash
+from flask_mysqldb import MySQL
 from werkzeug.utils import secure_filename
+from wtforms import Form, StringField, PasswordField, validators
+from passlib.hash import sha256_crypt
 import consulta_cep
 import os
 import json
@@ -15,28 +18,57 @@ ALLOWED_EXTENSIONS = {'xls', 'xlsx', 'csv'}
 # Configurando a instância inicial do Flask
 app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.secret_key = '@123456'
 
+# Configuração Mysql:
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_DB'] = 'consulta_cep_app'
+app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+
+# Iniciando meu banco:
+mysql = MySQL(app)
 
 # Upload de arquivo:
+
+
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# Antes de carregar novos arquivos limpa o diretório de Upload
+
+
+def limpa_diretorio():
+    for _, _, files in os.walk(UPLOAD_FOLDER):
+        for file in files:
+            try:
+                os.remove(os.path.join(UPLOAD_FOLDER, file))
+            except OSError as e:
+                print(f'Error: {e.strerror}')
+
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
+    limpa_diretorio()
+
     if request.method == 'POST':
         # Check if the past request has the file part
         print(request.files)
         if 'file' not in request.files:
-            flash('No file part')
+            flash('Sem arquivos para upload.', 'primary')
             return redirect(request.url)
         file = request.files['file']
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
         if file.filename == '':
-            flash('Você não selecionou nenhum arquivo.', 'danger')
+            flash('Você não selecionou nenhum arquivo.', 'warning')
             return redirect(request.url)
+
+        if file and not allowed_file(file.filename):
+            flash('A extensão do arquivo selecionado, não é válida.', 'danger')
+
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             full_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -150,8 +182,63 @@ def executar_consulta():
 
     return render_template('index.html')
 
+# Classe do formulário de registro
+
+
+class RegisterForm(Form):
+    name = StringField('Name', [validators.Length(min=3, max=100)])
+    username = StringField('Username', [validators.Length(min=4, max=45)])
+    token = StringField('Token', [validators.Length(min=10, max=150)])
+    email = StringField('Email', [validators.Length(min=6, max=120)])
+    password = PasswordField('Password', [validators.DataRequired(),
+                                          validators.EqualTo(
+                                              'confirm', message='Senha incorreta')
+                                          ])
+    confirm = PasswordField('Confirme a senha')
+
+# Registro do usuário
+
+
+@app.route('/registrar', methods=['GET', 'POST'])
+def registrar():
+    form = RegisterForm(request.form)
+    if request.method == 'POST' and form.validate():
+        name = form.name.data
+        email = form.email.data
+        token = form.token.data
+        username = form.username.data
+        password = sha256_crypt.encrypt(str(form.password.data))
+
+        # Criando um cursor
+        cur = mysql.connect.cursor()
+
+        # Execute insert no banco
+        cur.execute("INSERT INTO users(name, email, username, token, password) VALUES(%s, %s, %s, %s, %s"), (
+            name, email, username, token, password)
+
+        # Commit
+        mysql.connection.commit()
+
+        # Fechando a conexão:
+        cur.close()
+
+        flash('Você foi registrado e já pode fazer login', 'success')
+
+        return redirect(url_for('logar'))
+
+    return render_template('registrar.html', form=form)
+
+
+@app.route('/logar', methods=['POST', 'GET'])
+def logar():
+    return render_template('logar.html')
+
+
+@app.route('/sobre', methods=['GET'])
+def sobre():
+    return render_template('sobre.html')
+
 
 if __name__ == '__main__':
-    # app.secret_key = '@123456'
-    # app.run(debug=True)
-    ...
+    app.secret_key = '@123456'
+    app.run(debug=True)

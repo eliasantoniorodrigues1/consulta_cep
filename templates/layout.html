@@ -5,75 +5,25 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style/style.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style/bootstrap.min.css') }}">
   <title>Consulta CEP</title>
 </head>
 
 <body>
-  <div class="container" id="tudo">
     <!-- Header -->
     {% include 'includes/_navbar.html' %}
-    <!-- Content -->
-    <div id="conteudo">
-      {% include'includes/_messages.html' %}
+    <div class="container">
+      <!-- Mensagens -->
+      {% include 'includes/_messages.html' %}
       {% block body %}{% endblock %}
-      <br>
-      <form method="post" enctype="multipart/form-data" action="/">
-        <label for="formFileSm" class="form-label"><strong>Por favaor, carregue uma planilha contendo apenas a coluna de CEP:</strong></label>
-        <input class="form-control form-control-1g" id="formFilelg" type="file" name="file">
-        <br>
-        <input class="btn btn-primary" type="submit" value="Upload">
-      </form>
     </div>
-
-    <div class="display">
-        <form method="post" action="/executar-consulta">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th scope="col">Nome do Arquivo</th>
-                    </tr>
-               </thead>
-               <tbody>
-                 <tr>
-                  <td>{{ filename }}</td>
-                  </tr>
-                </tbody>
-              </table>
-              <label for="formFileSm" class="form-label">Insira seu e-mail para receber o arquivo, após o término do processamento:</label>
-              <input type="email" class="form-control" name="email_input" placeholder="Digite seu e-mail">
-              <small id="emailHelp" class="form-text text-muted">Seu e-mail não ficará salvo na nossa base de dados</small>
-              <br>
-              <br>
-              <input class="btn btn-primary" type="submit" value="Executar Consulta" name="btnexecutar">
-        </form>
+    <div class="container">
+      {% include 'includes/_rodape.html' %}
     </div>
-    <br>
-    <p id="progress-bar">Ao final do processo você receberá um email com o arquivo consolidado.</p>
-    <!-- Footer -->
-    <div id="rodape">
-      <footer class="footer navbar-fixed-bottom">
-        <div class="social">
-          <a href="https://www.instagram.com/elias.rodrigues1/" class="me-4 text-reset">
-            <i class="fab fa-instagram"></i>
-          </a>
-          <a href="https://www.linkedin.com/in/elias-antonio-rodrigues-525b5933/" class="me-4 text-reset">
-            <i class="fab fa-linkedin"></i>
-          </a>
-          <a href="https://github.com/eliasantoniorodrigues1" class="me-4 text-reset">
-            <i class="fab fa-github"></i>
-          </a>
-          <div class="text-center p-4" style="background-color: rgba(0, 0, 0, 0.05);">
-            © 2021 Desenvolvido por:
-            <a class="text-reset fw-bold" href="https://mdbootstrap.com/">Elias Rodrigues</a>
-          </div>
-      </footer>      
-    </div>
-  </div>
-  <script src="js/bootstrap.min.js"></script>
-  <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-  <script src="https://kit.fontawesome.com/25f4485ca7.js" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="//cdn.ckeditor.com/4.6.2/basic/ckeditor.js"></script>
+    <script src="https://kit.fontawesome.com/25f4485ca7.js" crossorigin="anonymous"></script>
 </body>
 
 </html>
