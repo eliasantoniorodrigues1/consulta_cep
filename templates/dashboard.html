@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+  <h1>Seus dados <small> Bem vindo {{session.username}}</small></h1>
+  <hr>
+  <table class="table table-striped">
+    <tr>
+      <th>ID</th>
+      <th>NOME</th>
+      <th>E-MAIL</th>
+      <th>TOKEN</th>
+    </tr>
+    <tr>
+  {% for dado in dados_usuario %}
+    <tr>
+      <td>{{dado.id}}</td>
+      <td>{{dado.nome}}</td>
+      <td>{{dado.email}}</td>
+      <td>{{dado.token}}</td>
+    </tr>
+  {% endfor %}
+  </table>
+{% endblock %}

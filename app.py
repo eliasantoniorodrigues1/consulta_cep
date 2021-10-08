@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, url_for, redirect, flash
+from flask import Flask, request, render_template, url_for, redirect, flash, session, logging
 from flask_mysqldb import MySQL
 from werkzeug.utils import secure_filename
 from wtforms import Form, StringField, PasswordField, validators
@@ -7,6 +7,7 @@ import consulta_cep
 import os
 import json
 from time import sleep
+from functools import wraps
 
 # Diretório padrão do projeto:
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -17,14 +18,14 @@ ALLOWED_EXTENSIONS = {'xls', 'xlsx', 'csv'}
 
 # Configurando a instância inicial do Flask
 app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = '@123456'
-
+# Configuração de upload
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # Configuração Mysql:
-app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'consulta_cep_app'
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_DB'] = 'consulta_cep'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 # Iniciando meu banco:
@@ -204,17 +205,18 @@ def registrar():
     form = RegisterForm(request.form)
     if request.method == 'POST' and form.validate():
         name = form.name.data
-        email = form.email.data
-        token = form.token.data
         username = form.username.data
+        token = form.token.data
+        email = form.email.data
         password = sha256_crypt.encrypt(str(form.password.data))
+        flash(f'{name} {username} {token} {email} {password}')
 
         # Criando um cursor
         cur = mysql.connect.cursor()
 
         # Execute insert no banco
-        cur.execute("INSERT INTO users(name, email, username, token, password) VALUES(%s, %s, %s, %s, %s"), (
-            name, email, username, token, password)
+        cur.execute('''INSERT INTO usuarios(nome, usuario, token, email, senha) VALUES(%s, %s, %s, %s, %s)''', (
+            name, username, token, email, password))
 
         # Commit
         mysql.connection.commit()
@@ -229,9 +231,88 @@ def registrar():
     return render_template('registrar.html', form=form)
 
 
-@app.route('/logar', methods=['POST', 'GET'])
+@app.route('/logar', methods=['GET', 'POST'])
 def logar():
+    if request.method == 'POST':
+        # Obtém os campos do formulário
+        username = request.form['username']
+        password_candidato = request.form['password']
+
+        # Cria o cursor
+        cur = mysql.connection.cursor()
+
+        # Obtém o usuário pelo nome
+        result = cur.execute(
+            "SELECT * FROM USUARIOS WHERE usuario = %s", [username])
+
+        if result > 0:
+            # Obtém o hash da senha:
+            data = cur.fetchone()
+            password = data['senha']
+
+            # Compara as senhas:
+            if sha256_crypt.verify(password_candidato, password):
+                app.logger.info('PASSWORD CORRETO')
+                # Passou
+                session['logged_in'] = True
+                session['username'] = username
+
+                flash('Agora você está logado!', 'success')
+                # return redirect(url_for('index.html'))
+                return render_template('index.html')
+
+            else:
+                error = 'Usuário não encontrado'
+                return render_template('logar.html', error=error)
+
+        # Fecha a conexão
+        cur.close()
+
     return render_template('logar.html')
+
+
+# Checar se o usuário está logado
+def is_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('Não autorizado, por favor faça login.', 'danger')
+            return redirect(url_for('logar'))
+
+    return wrap
+
+
+@app.route('/sair')
+def sair():
+    session.clear()
+    flash('Você deslogou', 'success')
+    return redirect(url_for('logar'))
+
+
+# Dados do usuário
+@app.route('/dashboard')
+@is_logged_in
+def dashboard():
+    # Cursor
+    cur = mysql.connection.cursor()
+
+    # Obtém dados do usuário
+    result = cur.execute('''SELECT id, nome, email, token FROM usuarios WHERE usuario = %s''', [session['username']])
+
+    dados_usuario = cur.fetchall()
+    
+    # Fecha a conexão
+    cur.close()
+
+    if result > 0:
+        app.logger.info(dados_usuario)
+        return render_template('dashboard.html', dados_usuario=dados_usuario)
+    else:
+        msg = 'Dados do usuário não localizado'
+        return render_template('dashboard.html', msg=msg)
+
 
 
 @app.route('/sobre', methods=['GET'])
