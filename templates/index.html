@@ -8,13 +8,15 @@
   </div>
 
   <div class="container">
+    <div class="container">
       <form method="post" enctype="multipart/form-data" action="/">
         <label for="formFileSm" class="form-label"><strong>Por favor, carregue uma planilha contendo apenas a coluna de CEP:</strong></label>
         <input class="form-control form-control-1g" id="formFilelg" type="file" name="file">
         <br>
         <input class="btn btn-primary" type="submit" value="Upload" id="upload">
       </form>
-
+    </div>
+    <div class="container">
       <form method="post" action="/executar-consulta">
             <table class="table">
               <thead>
@@ -28,12 +30,14 @@
                   </tr>
                 </tbody>
               </table>
-              <label for="formFileSm" class="form-label">Insira seu e-mail para receber o arquivo, após o término do processamento:</label>
+              <!-- <label for="formFileSm" class="form-label">Insira seu e-mail para receber o arquivo, após o término do processamento:</label>
               <input type="email" class="form-control" name="email_input" placeholder="Digite seu e-mail">
               <small id="emailHelp" class="form-text text-muted">Seu e-mail não ficará salvo na nossa base de dados</small>
               <br>
               <br>
-              <input class="btn btn-primary" type="submit" value="Executar Consulta" name="btnexecutar" id="executar">
+              -->
+              <input class="btn btn-primary" type="submit" value="Executar" name="btnexecutar" id="executar">
         </form>
+    </div>
   </div>
 {% endblock %}

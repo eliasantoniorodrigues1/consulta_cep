@@ -16,10 +16,19 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 
 
-def carrega_dados_inicial(file_path):
+def carrega_dados_inicial():
     # Pego a coluna de CEP da base da Michele:
-    df = pd.read_excel(file_path)
-    ceps = df.iloc[:, 0].dropna().drop_duplicates()
+    for _, _, files in os.walk(UPLOAD_FOLDER):
+        file_path = os.path.join(UPLOAD_FOLDER, files[0])
+        _, extensao = os.path.splitext(files[0])
+
+    if 'xls' in extensao:
+        df = pd.read_excel(file_path)
+        ceps = df.iloc[:, 0].dropna().drop_duplicates()
+    else:
+        df = pd.read_csv(file_path)
+        ceps = df.iloc[:, 0].dropna().drop_duplicates()
+
     return list(ceps)
 
 
@@ -61,16 +70,16 @@ def remove_non_digit(string: str):
 
 
 def salva_csv():
-    with open(os.path.join(BASE_DIR, 'consulta.json'), encoding='utf-8') as f:
-        dados = json.load(f)
+    # with open(os.path.join(BASE_DIR, 'consulta.json'), encoding='utf-8') as f:
+    #     dados = json.load(f)
 
-    with open(os.path.join(BASE_DIR, 'Resultado_Consulta_Cep.CSV'), 'w+', encoding='utf-8') as arq:
-        cabecalhos = list(dados[0].keys())
-        w = csv.DictWriter(arq, fieldnames=cabecalhos, lineterminator='\n')
-        w.writeheader()
-        for dado in dados:
-            w.writerow(dado)
-
+    # with open(os.path.join(BASE_DIR, 'Resultado_Consulta_Cep.CSV'), 'w+', encoding='utf-8') as arq:
+    #     cabecalhos = list(dados[0].keys())
+    #     w = csv.DictWriter(arq, fieldnames=cabecalhos, lineterminator='\n')
+    #     w.writeheader()
+    #     for dado in dados:
+    #         w.writerow(dado)
+    ...
 
 def envia_email(to, subject, messsage, filename=None, imagem=None, frm=None, host='smtp.gmail.com', port=587, password=None):
 
@@ -115,63 +124,3 @@ def envia_email(to, subject, messsage, filename=None, imagem=None, frm=None, hos
 
 if __name__ == '__main__':
     ...
-    # # Carga inicial de ceps para consulta:
-    # # Dados enviado pelo usuário:
-    # ceps = carrega_dados_inicial(None)
-    # # ceps = [32187120, 30190060, 32210700, 68740000]
-
-    # # Carrega os ceps da base de dados para uma lista
-    # # e valida se o mesmo já foi consultado:
-    # lista_ceps_consultados = consulta_cep_consolidado()
-
-    # dados_cep = []
-    # print(f'Coletando dados dos ceps...')
-
-    # # Carrega o json para adicionar ou não um valor a ele:
-    # with open(os.path.join(BASE_DIR, 'ceps_consolidado.json'), 'r', encoding='utf-8') as f:
-    #     base_consolidada = json.load(f)
-
-    # for i, cep in enumerate(ceps):
-    #     # Valida se será necessário realizar o request do cep
-    #     if cep in lista_ceps_consultados:
-    #         continue
-    #     else:
-    #         print('Consultar Cep')
-    #         # O intervalo entre cada request tem que ser
-    #         # de 1 segundo senão o site bloqueia:
-    #         # Máximo de 10 mil consultas por dia.
-    #         sleep(1.1)
-    #         print(f'CEP: {cep}')
-    #         dicionario = dict(consulta_cep(str(cep)))
-    #         print(f'Resultado da busca: {dicionario}')
-
-    #         # Se retornar alguma coisa na pesquisa salva:
-    #         if dicionario:
-    #             # Cria o dicionário com os valores que desejo do json:
-    #             dict_data = {
-    #                 'cep': dicionario['cep'] if 'cep' in dicionario.keys() else 'NE',
-    #                 'estado': dicionario['estado']['sigla'] if 'estado' in dicionario.keys() else 'NE',
-    #                 'cidade': dicionario['cidade']['nome'] if 'cidade' in dicionario.keys() else 'NE',
-    #                 'ddd': dicionario['cidade']['ddd'] if 'cep' in dicionario.keys() else 'NE',
-    #                 'logradouro': dicionario['logradouro'] if 'logradouro' in dicionario.keys() else 'NE'
-    #             }
-    #         else:
-    #             dict_data = {
-    #                 'cep': cep,
-    #                 'estado': 'NE',
-    #                 'cidade': 'NE',
-    #                 'ddd': 'NE',
-    #                 'logradouro': 'NE'
-    #             }
-
-    #         # Consolida a informação na lista geral:
-    #         base_consolidada.append(dict_data.copy())
-    #         dict_data.clear()
-    #         dicionario.clear()
-
-    # # Regrava os dados no json:
-    # with open(os.path.join(BASE_DIR, 'ceps_consolidado.json'), 'w+', encoding='utf-8') as f:
-    #     json.dump(base_consolidada, f, indent=4)
-
-    # with open(os.path.join(BASE_DIR, 'consulta.json'), 'w+', encoding='utf-8') as f:
-    #     json.dump(consulta, f, indent=4)

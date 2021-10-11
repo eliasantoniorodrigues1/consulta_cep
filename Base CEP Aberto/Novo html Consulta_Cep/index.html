@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <title>Consulta CEP</title>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Cabeçalho -->
+    <header>
+      <nav class="navbar navbar-fixed-top" role="navigation">
+        <ul class="li">Início</ul>
+        <ul class="li">Sobre</ul>
+        <ul class="li">Registrar-se</ul>
+        <ul class="li">Entrar</ul>
+    </nav>
+    <div class="jumbotron">
+      <h1 class="display-6">Consulta Cep</h1>
+      <p class="lead">Essa aplicação permite consultar ceps em lote para facilitar a sua vida!</p>
+      <hr class="my-4">
+    </div>
+    </header>
+    <!-- Principal -->
+    <main>
+      <div class="row">
+        <div class="col-sm-10">
+            <form method="post" enctype="multipart/form-data" action="/">
+              <label for="formFileSm" class="form-label"><strong>Por favor, carregue uma planilha contendo apenas a coluna
+                  de CEP:</strong></label>
+              <input class="form-control form-control-1g" id="formFilelg" type="file" name="file">
+              <br>
+              <input class="btn btn-primary" type="submit" value="Upload" id="upload">
+            </form>
+          </div>
+      </div>
+      <!-- Arquivo carregado pelo usuario -->
+      <div class="row">
+        <div class="col-sm-10">
+            <form method="post" action="/executar-consulta">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Nome do Arquivo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ filename }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <input class="btn btn-primary" type="submit" value="Executar" name="btnexecutar" id="executar">
+            </form>
+          </div>
+      </div>
+
+    </main>
+    <!-- Seção -->
+    <aside>
+      <h6 class="title">Etapas do Processo de consulta em lote:</h6>
+        <ul class="li">1º Carregar um arquivo (xls, xlsx, csv)</ul>
+        <ul class="li">2º Seu arquivo deve ter apenas uma coluna com um cabeçalho</ul>
+        <ul class="li">3º Após o término do processamento o arquivo será entregue no seu e-mail em formato de csv</ul>
+        <ul class="li">4º Apoie o projeto do portal <a href="https://www.cepaberto.com" target="blank">Cep Aberto</a></ul>
+    </aside>
+    <!-- Rodape -->
+    <footer class="footer footer-copyright">
+      <div class="social">
+         <div class="text-center p-4" style="background-color: rgba(0, 0, 0, 0.05);">
+          <a href="https://www.instagram.com/elias.rodrigues1/" class="me-4 text-center">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="https://www.linkedin.com/in/elias-antonio-rodrigues-525b5933/" class="me-4 text-center">
+            <i class="fab fa-linkedin"></i>
+          </a>
+          <a href="https://github.com/eliasantoniorodrigues1" class="me-4 text-center">
+            <i class="fab fa-github"></i>
+          </a>
+          © 2021 Desenvolvido por: Elias Rodrigues
+          <!-- <a class="text-center fw-bold" href="https://www.linkedin.com/in/elias-antonio-rodrigues-525b5933/">Elias Rodrigues</a> -->
+        </div>
+    </footer>
+
+  </div>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="//cdn.ckeditor.com/4.6.2/basic/ckeditor.js"></script>
+    <script src="https://kit.fontawesome.com/25f4485ca7.js" crossorigin="anonymous"></script>
+    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+</body>
+
+</html>

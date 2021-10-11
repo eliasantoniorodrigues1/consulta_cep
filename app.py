@@ -50,13 +50,51 @@ def limpa_diretorio():
                 print(f'Error: {e.strerror}')
 
 
+def insert(tabela, *args):
+    '''Essa função recebe um dicionário e faz
+    uma inserção dinâmica convertendo as chaves do dict
+    em campos de coluna para o banco e os valores em values'''
+
+    # Cria campo de colunas do banco
+    # colunas = tuple(args[0].keys())
+    valores = tuple(args[0].values())
+    # q = f'INSERT INTO {tabela} {colunas} VALUES {valores}'
+    q = f'INSERT INTO {tabela} VALUES {valores};'
+
+    # Monta a constula
+    return q
+
+
+def select(tabela, campo, *args):
+    valores = tuple(args[0].values())
+    q = f'SELECT * FROM {tabela} WHERE {campo} in {valores}'
+    return q
+
+
+def executa_acao_banco(q):
+    app.logger.info(q)
+    cur = mysql.connection.cursor()
+    # cur.execute('''CREATE TABLE examplo (id INTEGER, nome VARCHAR(20))''')
+    try:
+        cur.execute(q)
+        cur.connection.commit()
+    except Exception as e:
+        flash(f'{str(e)}', 'danger')
+    # Fecha a conexão
+    cur.close()
+
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
     limpa_diretorio()
 
     if request.method == 'POST':
         # Check if the past request has the file part
-        print(request.files)
         if 'file' not in request.files:
             flash('Sem arquivos para upload.', 'primary')
             return redirect(request.url)
@@ -91,26 +129,19 @@ def upload_file():
 
 @app.route('/executar-consulta', methods=['POST', 'GET'])
 def executar_consulta():
-    # Coleto o email digitado pelo usuário
-    email = request.form['email_input']
-    with open(os.path.join(BASE_DIR, 'dados_usuario.json'), 'r') as f:
-        dict_usuario = json.load(f)
-        dict_usuario['email'] = email
-
-    # Salva dados do usuário no json:
-    with open(os.path.join(BASE_DIR, 'dados_usuario.json'), 'w+') as f:
-        json.dump(dict_usuario, f, indent=4)
-
     # Lista de Ceps que serão consultados:
-    ceps = consulta_cep.carrega_dados_inicial(
-        os.path.join(UPLOAD_FOLDER, dict_usuario['filename']))
+    for _, _, files in os.walk(UPLOAD_FOLDER):
+        ceps = set(consulta_cep.carrega_dados_inicial()) # Converte para um set para remover duplicatas
 
     # Valida se a lista de ceps já foi consultada:
-    lista_ceps_consultados = consulta_cep.consulta_cep_consolidado()
+    cur = mysql.connect.cursor()
+    cur.execute('SELECT cep FROM cep')
+    lista_ceps_consultados = cur.fetchall()
+    app.logger.info(lista_ceps_consultados)
 
     # Carrega o json para adicionar ou não um valor a ele:
-    with open(os.path.join(BASE_DIR, 'ceps_consolidado.json'), 'r', encoding='utf-8') as f:
-        base_consolidada = json.load(f)
+    # with open(os.path.join(BASE_DIR, 'ceps_consolidado.json'), 'r', encoding='utf-8') as f:
+    #     base_consolidada = json.load(f)
 
     for i, cep in enumerate(ceps):
         # Valida se será necessário realizar o request do cep
@@ -127,57 +158,66 @@ def executar_consulta():
             # Se retornar alguma coisa na pesquisa salva:
             if dicionario:
                 # Cria o dicionário com os valores que desejo do json:
+                ddd = dicionario['cidade']['ddd'] 
+                if not ddd:
+                    ddd = 0
+                    
                 dict_data = {
-                    'cep': dicionario['cep'] if 'cep' in dicionario.keys() else 'NE',
-                    'estado': dicionario['estado']['sigla'] if 'estado' in dicionario.keys() else 'NE',
-                    'cidade': dicionario['cidade']['nome'] if 'cidade' in dicionario.keys() else 'NE',
-                    'ddd': dicionario['cidade']['ddd'] if 'cep' in dicionario.keys() else 'NE',
-                    'logradouro': dicionario['logradouro'] if 'logradouro' in dicionario.keys() else 'NE'
+                    'cep': dicionario['cep'],
+                    'estado': dicionario['estado']['sigla'] if 'estado' in dicionario.keys() else 'null',
+                    'cidade': dicionario['cidade']['nome'] if 'cidade' in dicionario.keys() else 'null',
+                    'ddd': ddd,
+                    'logradouro': dicionario['logradouro'] if 'logradouro' in dicionario.keys() else 'null',
+                    'bairro': dicionario['bairro'] if 'bairro' in dicionario.keys() else 'null'
                 }
+                # Executa insert no banco da lista consolidada:
+                executa_acao_banco(insert('cep', dict_data))
             else:
                 dict_data = {
                     'cep': cep,
                     'estado': 'NE',
                     'cidade': 'NE',
                     'ddd': 'NE',
-                    'logradouro': 'NE'
+                    'logradouro': 'NE',
+                    'bairro': 'NE'
                 }
 
             # Consolida a informação na lista geral:
-            base_consolidada.append(dict_data.copy())
+            # base_consolidada.append(dict_data.copy())
             dict_data.clear()
             dicionario.clear()
 
     # Regrava os dados no json:
-    with open(os.path.join(BASE_DIR, 'ceps_consolidado.json'), 'w+', encoding='utf-8') as f:
-        json.dump(base_consolidada, f, indent=4)
+    # with open(os.path.join(BASE_DIR, 'ceps_consolidado.json'), 'w+', encoding='utf-8') as f:
+    #     json.dump(base_consolidada, f, indent=4)
 
     # Retorna um json apenas com a consulta do usuário:
-    with open(os.path.join(BASE_DIR, 'ceps_consolidado.json'), 'r', encoding='utf-8') as f:
-        filtrar = json.load(f)
+    # Fazer um select do que o usuário está consultando.
+    # with open(os.path.join(BASE_DIR, 'ceps_consolidado.json'), 'r', encoding='utf-8') as f:
+    #     filtrar = json.load(f)
 
-    consulta = []
-    for cep in ceps:
-        for dado in filtrar:
-            if int(dado['cep']) == int(cep):
-                consulta.append(dado)
+    # consulta = []
+    # for cep in ceps:
+    #     for dado in filtrar:
+    #         if int(dado['cep']) == int(cep):
+    #             consulta.append(dado)
 
     # Salva um json com a consulta do usuário:
-    with open(os.path.join(BASE_DIR, 'consulta.json'), 'w+', encoding='utf-8') as f:
-        json.dump(consulta, f, indent=4)
+    # with open(os.path.join(BASE_DIR, 'consulta.json'), 'w+', encoding='utf-8') as f:
+    #     json.dump(consulta, f, indent=4)
 
     # Cria o arquivo CSV que será enviado por email:
     consulta_cep.salva_csv()
 
     # Envia email
-    with open(os.path.join(BASE_DIR, 'dados_usuario.json'), 'r') as f:
-        dict_usuario = json.load(f)
+    # with open(os.path.join(BASE_DIR, 'dados_usuario.json'), 'r') as f:
+    #     dict_usuario = json.load(f)
 
-    with open(os.path.join(TEMPLATE_DIR, 'mensagem_email.html'), 'r') as html:
-        mensagem = html.read()
+    # with open(os.path.join(TEMPLATE_DIR, 'mensagem_email.html'), 'r') as html:
+    #     mensagem = html.read()
 
-    consulta_cep.envia_email(dict_usuario['email'],
-                             'Resultado da sua consulta de CEPS', mensagem)
+    # consulta_cep.envia_email(dict_usuario['email'],
+    #                          'Resultado da sua consulta de CEPS', mensagem)
 
     flash('Tudo certo, agora é só aguardar o e-mail chegar na sua caixa de entrada', 'success')
 
@@ -287,7 +327,7 @@ def is_logged_in(f):
 @app.route('/sair')
 def sair():
     session.clear()
-    flash('Você deslogou', 'success')
+    flash('Você deslogou-se da aplicação.', 'success')
     return redirect(url_for('logar'))
 
 
@@ -299,10 +339,11 @@ def dashboard():
     cur = mysql.connection.cursor()
 
     # Obtém dados do usuário
-    result = cur.execute('''SELECT id, nome, email, token FROM usuarios WHERE usuario = %s''', [session['username']])
+    result = cur.execute('''SELECT id, nome, email, token FROM usuarios WHERE usuario = %s''', [
+                         session['username']])
 
     dados_usuario = cur.fetchall()
-    
+
     # Fecha a conexão
     cur.close()
 
@@ -312,7 +353,6 @@ def dashboard():
     else:
         msg = 'Dados do usuário não localizado'
         return render_template('dashboard.html', msg=msg)
-
 
 
 @app.route('/sobre', methods=['GET'])

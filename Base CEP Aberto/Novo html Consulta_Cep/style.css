@@ -1,0 +1,43 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  color: black;
+  font-weight: bolder;
+}
+body {
+  width: 100%;
+  margin: auto;
+  background: rgb(241, 237, 237);
+  background: linear-gradient(184deg, rgb(229, 226, 226) 0%, rgb(255, 255, 255) 100%);
+}
+/* O meu container será configurado como grid */
+.container {
+  display: grid;
+  /* Definição do total de colunas do grid */
+  grid-template-columns: 12fr 4fr;
+  grid-template-rows: 30vh 60vh 10vh;
+  grid-template-areas: "header header"
+                       "main aside"
+                       "footer footer"
+}
+
+header {
+  grid-area: header;
+}
+
+main {
+  grid-area: main;
+}
+
+aside {
+  grid-area: aside;
+}
+
+footer {
+  grid-area: footer;
+}
+
+input.form-control, table {
+  width: 100%;
+}

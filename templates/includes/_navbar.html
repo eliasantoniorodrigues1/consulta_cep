@@ -1,32 +1,61 @@
-<nav class="navbar navbar-dark">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
-        aria-expanded="false" aria-controls="navbar">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="#">Simplifique</a>
-    </div>
-    <div id="navbar" class="collapse navbar-collapse">
-      <ul class="nav navbar-nav">
-        <li><a href="/">Início</a></li>
-        <li><a href="/sobre">Sobre</a></li>
-      </ul>
 
-      <ul class="nav navbar-nav navbar-right">
+<div class="container">
+  <div class="row">
+    <div class="span12">
+      <div class="head">
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="span6">
+                    <h1 class="muted">Simplifique</h1>
+                </div>
+
+                <!--<div class="span4 offset2" style="margin-top:15px;">
+                  {% if session.logged_in %}
+                    <li><a href="/sair">Sair</a></li>
+                  {% else %}
+                    <li><a href="/logar">Entrar</a></li>
+                  {% endif %}
+                </div> -->
+            </div>
+        </div>
+
         {% if session.logged_in %}
-          <li><a href="/dashboard">Meus dados</a></li>
-          <li><a href="/sair">Sair</a></li>
-        {% else %}
-          <li><a href="/registrar">Registrar</a></li>
-          <li><a href="/logar">Logar</a></li>
-        {% endif %}
-
-      </ul>
+              <div class="navbar">
+                <div class="navbar-inner">
+                    <div class="container">        
+                        <ul class="nav">
+                              <li>
+                                <a href="/">Início</a>
+                              </li>
+                              <li>
+                                  <a href="/sobre">Sobre</a>
+                              </li>
+                        </ul>             
+                        </div>
+                      </div>
+                  <div class="navbar-inner" id="sair">
+                    <div class="container">
+                      <ul class="nav">
+                        <li>
+                          <a href="/sair">Sair</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+      
+            {% else %}
+            <div class="navbar">
+              <div class="navbar-inner">
+                  <div class="container">        
+                      <ul class="nav">
+                        <li>
+                          <a href="/registrar">Registrar-se</a>
+                      </li>
+                      </ul>             
+                      </div>
+                    </div>
+          {% endif %}     
+      </div>
     </div>
-    <!--/.nav-collapse -->
   </div>
-</nav>
+</div>
